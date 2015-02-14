@@ -2,33 +2,37 @@
 
 var boardX = 700;
 var boardY = 450;
-var enemies = 30;
-var difficulty = 1000;
+var enemies = 60;
+var difficulty = 500;
 var size = 5;
 collisions = 0;
 score = 0;
 highScore = 0;
+shuriken = false;
 
-d3.select("body")
-.append("svg")
-.attr("width",boardX)
-.attr("height",boardY)
-.append("rect")
-.attr("width",boardX)
-.attr("height",boardY)
-.attr("style","fill:red");
-var board = d3.select("svg");
-// board
-// .append("rect")
-// .attr("width", 100)
-// .attr('height',50)
-// .attr('style','fill:blue');
-
-// var randX = function(boardX) {
-//   return boardX*random();
+// var createBoard = function(){
+  d3.select("body")
+  .append("svg")
+  .attr("width",boardX)
+  .attr("height",boardY)
+  .append("rect")
+  .attr("width",boardX)
+  .attr("height",boardY)
+  .attr("style","fill:red");
+  var board = d3.select("svg");
 // }
 
-
+var setUpShuriken = function(){
+  d3.select('body')
+  .append('svg')
+  .attr({id:'mySvg',width:20, height:19})
+  .append('defs')
+  .attr({id: 'mdef'})
+  .append('pattern')
+  .attr({id: 'image', x:0,y:0,height:19,width:20})
+  .append('image')
+  .attr({x:0,y:0,width:20,height:19,'xlink:href':'ninja_star_sm.png'});
+}
 
 var generatePositions = function(n,boardX,boardY){
   var positions = [];
@@ -53,6 +57,7 @@ var drawEnemies = function(){
     .attr("cx", function(d){return d.x;})
     .attr("cy", function(d){return d.y;})
     .attr("style", 'fill:black')
+    // .style('fill','url(#image)')
     .attr("r", size)
     .attr("class","enemy");
 };
@@ -65,6 +70,7 @@ var moveEnemies = function(){
    .duration(difficulty)
    .attr("cx", function(d){return d.x;})
    .attr("cy", function(d){return d.y;});
+   // .attr("style", 'fill:url(#image)',' transform:rotate(180deg)');
 };
 
 var dragMove = function(d){
@@ -104,7 +110,7 @@ var collisionDetector = function(endData,t){
 
 
   if(distanceToHero(x,y) < 2 * size){
-    console.log("COLLLLIDEDED");
+    // console.log("COLLLLIDEDED");
     collision();
   }
 };
@@ -134,7 +140,10 @@ var updateScore = function(){
   d3.select(".current").select("span").text(score);
 };
 
-
+// createBoard();
+if (shuriken){
+  setUpShuriken();
+}
 drawHero();
 drawEnemies();
 setInterval(moveEnemies,difficulty);

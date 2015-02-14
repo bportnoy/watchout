@@ -4,6 +4,10 @@ var boardX = 700;
 var boardY = 450;
 var enemies = 30;
 var difficulty = 1000;
+var size = 5;
+collisions = 0;
+score = 0;
+highScore = 0;
 
 d3.select("body")
 .append("svg")
@@ -49,14 +53,16 @@ var drawEnemies = function(){
     .attr("cx", function(d){return d.x;})
     .attr("cy", function(d){return d.y;})
     .attr("style", 'fill:black')
-    .attr("r", 5)
+    .attr("r", size)
     .attr("class","enemy");
 };
 
 var moveEnemies = function(){
  var positions = generatePositions(enemies,boardX,boardY);
  board.selectAll(".enemy").data(positions,function(d){return d.id;})
-   .transition().duration(difficulty)
+   .transition()
+   .tween("custom", collisionTween)
+   .duration(difficulty)
    .attr("cx", function(d){return d.x;})
    .attr("cy", function(d){return d.y;});
 };
@@ -75,11 +81,61 @@ var drawHero = function(){
     .attr("cx", function(d){return d.x;})
     .attr("cy", function(d){return d.y;})
     .attr("style", "fill:gold")
-    .attr("r", 5)
+    .attr("r", size)
     .attr("class","hero")
     .call(drag);
 };
 
+var distanceToHero = function(currentX, currentY){
+  var hero = d3.selectAll(".hero").data()[0];
+  // console.log(hero);
+  var x = currentX - hero.x;
+  var y = currentY - hero.y;
+  var l = Math.sqrt( (x*x) + (y*y) );
+  return l;
+};
+
+var collisionDetector = function(endData,t){
+  var startData = d3.select(this);
+  x = parseFloat(startData.attr("cx")) + t * ( endData.x - parseFloat(startData.attr("cx")));
+  y = parseFloat(startData.attr("cy")) + t * ( endData.y - parseFloat(startData.attr("cy")));
+
+  debugger;
+
+
+  if(distanceToHero(x,y) < 2 * size){
+    console.log("COLLLLIDEDED");
+    collision();
+  }
+};
+
+var collisionTween = function(d){
+  // console.log(d);
+    // console.log(d3.select(this));
+
+  return function(t){
+    // console.log(t);
+    collisionDetector.call(this,d,t);
+  }
+};
+
+var collision = function(){
+  collisions++;
+  d3.select(".collisions").select("span").text(collisions);
+  if (score > highScore){
+    highScore = score;
+    d3.select(".high").select("span").text(highScore);
+  }
+  score = 0;
+};
+
+var updateScore = function(){
+  score++;
+  d3.select(".current").select("span").text(score);
+};
+
+
 drawHero();
 drawEnemies();
 setInterval(moveEnemies,difficulty);
+setInterval(updateScore,50);

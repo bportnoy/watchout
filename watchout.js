@@ -3,14 +3,31 @@
 var boardX = 700;
 var boardY = 450;
 var enemies = 60;
-var difficulty = 500;
-var size = 5;
-collisions = 0;
-score = 0;
-highScore = 0;
-shuriken = false;
+var difficulty = 2000;
+var size = 10;
+var collisions = 0;
+var score = 0;
+var highScore = 0;
+var shuriken = true;
+var month = new Date().getMonth();
+var day = new Date().getDate();
+var hearts = false;
+var enemyClass = '.enemy';
+var enemyString = enemyClass.slice(1);
 
-// var createBoard = function(){
+if (month === 1 && day == 14){
+  shuriken = true;
+  size = 10;
+  hearts = true;
+  // enemyClass = '.heart'
+}
+
+if (shuriken){
+enemyClass = '.shuriken';
+enemyString = enemyClass.slice(1);
+}
+
+var createBoard = function(){
   d3.select("body")
   .append("svg")
   .attr("width",boardX)
@@ -19,19 +36,34 @@ shuriken = false;
   .attr("width",boardX)
   .attr("height",boardY)
   .attr("style","fill:red");
-  var board = d3.select("svg");
-// }
+  window.board = d3.select("svg");
+}
 
 var setUpShuriken = function(){
-  d3.select('body')
-  .append('svg')
-  .attr({id:'mySvg',width:20, height:19})
-  .append('defs')
-  .attr({id: 'mdef'})
-  .append('pattern')
-  .attr({id: 'image', x:0,y:0,height:19,width:20})
-  .append('image')
-  .attr({x:0,y:0,width:20,height:19,'xlink:href':'ninja_star_sm.png'});
+  if (!hearts){
+    d3.select('body')
+    .append('svg')
+    .attr({id:'mySvg',width:20, height:19})
+    .append('defs')
+    .attr({id: 'mdef'})
+    .append('pattern')
+    .attr({id: 'image', x:0,y:0,height:19,width:20})
+    .append('image')
+    .attr({x:0,y:0,width:20,height:19,'xlink:href':'ninja_star_sm.png'});
+  }
+  else{
+    d3.select('body')
+    .append('svg')
+    .attr({id:'mySvg',width:20, height:19})
+    .append('defs')
+    .attr({id: 'mdef'})
+    .append('pattern')
+    .attr({id: 'image', x:0,y:0,height:19,width:20})
+    .append('image')
+    .attr({x:0,y:0,width:20,height:19,'xlink:href':'heart_sm.png'});
+
+    board.select("rect").attr('style', "fill:blue");
+  }
 }
 
 var generatePositions = function(n,boardX,boardY){
@@ -52,19 +84,19 @@ var generatePositions = function(n,boardX,boardY){
 
 var drawEnemies = function(){
   var positions = generatePositions(enemies,boardX,boardY);
-  board.selectAll(".enemy").data(positions, function(d){return d.id;})
+  board.selectAll(enemyClass).data(positions, function(d){return d.id;})
     .enter().append("circle")
     .attr("cx", function(d){return d.x;})
     .attr("cy", function(d){return d.y;})
-    .attr("style", 'fill:black')
+    // .attr("style", 'fill:black')
     // .style('fill','url(#image)')
     .attr("r", size)
-    .attr("class","enemy");
+    .attr("class",enemyString);
 };
 
 var moveEnemies = function(){
  var positions = generatePositions(enemies,boardX,boardY);
- board.selectAll(".enemy").data(positions,function(d){return d.id;})
+ board.selectAll(enemyClass).data(positions,function(d){return d.id;})
    .transition()
    .tween("custom", collisionTween)
    .duration(difficulty)
@@ -86,7 +118,7 @@ var drawHero = function(){
     .enter().append("circle")
     .attr("cx", function(d){return d.x;})
     .attr("cy", function(d){return d.y;})
-    .attr("style", "fill:gold")
+    // .attr("style", "fill:gold")
     .attr("r", size)
     .attr("class","hero")
     .call(drag);
@@ -105,10 +137,6 @@ var collisionDetector = function(endData,t){
   var startData = d3.select(this);
   x = parseFloat(startData.attr("cx")) + t * ( endData.x - parseFloat(startData.attr("cx")));
   y = parseFloat(startData.attr("cy")) + t * ( endData.y - parseFloat(startData.attr("cy")));
-
-  debugger;
-
-
   if(distanceToHero(x,y) < 2 * size){
     // console.log("COLLLLIDEDED");
     collision();
@@ -140,7 +168,7 @@ var updateScore = function(){
   d3.select(".current").select("span").text(score);
 };
 
-// createBoard();
+createBoard();
 if (shuriken){
   setUpShuriken();
 }

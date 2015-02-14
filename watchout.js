@@ -2,25 +2,26 @@
 
 var boardX = 700;
 var boardY = 450;
-var enemies = 60;
-var difficulty = 2000;
-var size = 10;
+var enemies = 5;
+var difficulty = 5000;
+var size = 5;
 var collisions = 0;
 var score = 0;
 var highScore = 0;
-var shuriken = true;
+var shuriken = false;
 var month = new Date().getMonth();
 var day = new Date().getDate();
 var hearts = false;
 var enemyClass = '.enemy';
 var enemyString = enemyClass.slice(1);
 
-if (month === 1 && day == 14){
-  shuriken = true;
-  size = 10;
-  hearts = true;
-  // enemyClass = '.heart'
-}
+//an easter egg for the lovers
+// if (month === 1 && day == 14){
+//   shuriken = true;
+//   size = 10;
+//   hearts = true;
+//   // enemyClass = '.heart'
+// }
 
 if (shuriken){
 enemyClass = '.shuriken';
@@ -36,6 +37,8 @@ var createBoard = function(){
   .attr("width",boardX)
   .attr("height",boardY)
   .attr("style","fill:red");
+  // .attr("style","stroke-width:1")
+  // .attr("style","stroke:black");
   window.board = d3.select("svg");
 }
 
@@ -62,7 +65,7 @@ var setUpShuriken = function(){
     .append('image')
     .attr({x:0,y:0,width:20,height:19,'xlink:href':'heart_sm.png'});
 
-    board.select("rect").attr('style', "fill:blue");
+    board.select("rect").attr('style', "fill:white");
   }
 }
 
@@ -125,10 +128,13 @@ var drawHero = function(){
 };
 
 var distanceToHero = function(currentX, currentY){
-  var hero = d3.selectAll(".hero").data()[0];
+  // var hero = d3.selectAll(".hero").data()[0];
+  var hero = d3.selectAll('.hero');
+  var herox = parseFloat(hero.attr('cx'));
+  var heroy = parseFloat(hero.attr('cy'));
   // console.log(hero);
-  var x = currentX - hero.x;
-  var y = currentY - hero.y;
+  var x = currentX - herox;
+  var y = currentY - heroy;
   var l = Math.sqrt( (x*x) + (y*y) );
   return l;
 };
